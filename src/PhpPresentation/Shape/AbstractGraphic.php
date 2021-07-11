@@ -68,6 +68,9 @@ abstract class AbstractGraphic extends AbstractShape implements ComparableInterf
      */
     public $relationId = null;
 
+
+    public $pngId = null;
+
     /**
      * Create a new \PhpOffice\PhpPresentation\Slide\AbstractDrawing.
      */

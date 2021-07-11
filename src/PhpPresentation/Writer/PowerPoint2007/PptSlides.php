@@ -99,6 +99,21 @@ class PptSlides extends AbstractSlide
                     $this->writeRelationship($objWriter, $relId, 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/image', '../media/' . $iterator->current()->getIndexedFilename());
                     $iterator->current()->relationId = 'rId' . $relId;
                     ++$relId;
+
+                    if($iterator->current()->getExtension() == 'svg') {
+                        $pngFileName = str_replace(' ', '_', $iterator->current()->getIndexedFilename());
+                        //Replace the .svg with .png
+                        $pngFileName = str_replace(".svg", ".png", $pngFileName);
+                        // Write relationship for image drawing
+                        $this->writeRelationship(
+                            $objWriter,
+                            $relId,
+                            'http://schemas.openxmlformats.org/officeDocument/2006/relationships/image',
+                            '../media/' . $pngFileName
+                        );
+                        $iterator->current()->pngId = 'rId' . $relId;
+                        ++$relId;
+                    }
                 } elseif ($iterator->current() instanceof ShapeChart) {
                     // Write relationship for chart drawing
                     $this->writeRelationship($objWriter, $relId, 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/chart', '../charts/' . $iterator->current()->getIndexedFilename());
@@ -122,6 +137,21 @@ class PptSlides extends AbstractSlide
                             $iterator2->current()->relationId = 'rId' . $relId;
 
                             ++$relId;
+
+                            if($iterator2->current()->getExtension() == 'svg') {
+                                $pngFileName = str_replace(' ', '_', $iterator2->current()->getIndexedFilename());
+                                //Replace the .svg with .png
+                                $pngFileName = str_replace(".svg", ".png", $pngFileName);
+                                // Write relationship for image drawing
+                                $this->writeRelationship(
+                                    $objWriter,
+                                    $relId,
+                                    'http://schemas.openxmlformats.org/officeDocument/2006/relationships/image',
+                                    '../media/' . $pngFileName
+                                );
+                                $iterator2->current()->pngId = 'rId' . $relId;
+                                ++$relId;
+                            }
                         } elseif ($iterator2->current() instanceof ShapeChart) {
                             // Write relationship for chart drawing
                             $this->writeRelationship($objWriter, $relId, 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/chart', '../charts/' . $iterator2->current()->getIndexedFilename());
@@ -837,11 +867,12 @@ class PptSlides extends AbstractSlide
 
         // a:blip
         $objWriter->startElement('a:blip');
-        $objWriter->writeAttribute('r:embed', $shape->relationId);
 
         //SVG info
 
         if($shape->getExtension() == 'svg') {
+
+            $objWriter->writeAttribute('r:embed', $shape->pngId);
             $objWriter->startElement('a:extLst');
             $objWriter->startElement('a:ext');
             $objWriter->writeAttribute('uri', '{28A0092B-C50C-407E-A947-70E740481C1C}');
@@ -864,6 +895,8 @@ class PptSlides extends AbstractSlide
             $objWriter->endElement();
 
         }
+        else
+            $objWriter->writeAttribute('r:embed', $shape->relationId);
 
         $objWriter->endElement();
 

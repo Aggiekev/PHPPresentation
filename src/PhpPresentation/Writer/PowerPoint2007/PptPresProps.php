@@ -62,6 +62,19 @@ class PptPresProps extends AbstractDecoratorWriter
 
         // > p:ext
         $objWriter->endElement();
+
+        // p:ext
+        $objWriter->startElement('p:ext');
+        $objWriter->writeAttribute('uri', '{FD5EFAAD-0ECE-453E-9831-46B23BE46B34}');
+        // p15:chartTrackingRefBased
+        $objWriter->startElement('p15:chartTrackingRefBased');
+        $objWriter->writeAttribute('xmlns:p15', "http://schemas.microsoft.com/office/powerpoint/2012/main");
+        $objWriter->writeAttribute('val', '0');
+        $objWriter->endElement();
+
+        // > p:ext
+        $objWriter->endElement();
+
         // > p:extLst
         $objWriter->endElement();
         // > p:presentationPr
