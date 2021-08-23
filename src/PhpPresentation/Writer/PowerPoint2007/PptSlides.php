@@ -406,7 +406,18 @@ class PptSlides extends AbstractSlide
                 $objWriter->startElement('a:stretch');
 
                 // a:fillRect
-                $objWriter->writeElement('a:fillRect');
+                $objWriter->startElement('a:fillRect');
+
+                $stretch = $oBackground->getStretch();
+
+                if(!empty($stretch)) {
+                    $objWriter->writeAttribute('l', "".$stretch['l']);
+                    $objWriter->writeAttribute('t', "".$stretch['t']);
+                    $objWriter->writeAttribute('r', "".$stretch['r']);
+                    $objWriter->writeAttribute('b', "".$stretch['b']);
+                }
+                // > a:fillRect
+                $objWriter->endElement();
 
                 // > a:stretch
                 $objWriter->endElement();

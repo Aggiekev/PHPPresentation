@@ -70,13 +70,30 @@ abstract class AbstractSlide extends AbstractDecoratorWriter
                     );
                     $iterator->current()->relationId = 'rId' . $relId;
                     ++$relId;
+
+                    //If it is an SVG
+                    if($iterator->current()->getExtension() == 'svg') {
+                        $pngFileName = str_replace(' ', '_', $iterator->current()->getIndexedFilename());
+                        //Replace the .svg with .png
+                        $pngFileName = str_replace(".svg", ".png", $pngFileName);
+                        // Write relationship for image drawing
+                        $this->writeRelationship(
+                            $objWriter,
+                            $relId,
+                            'http://schemas.openxmlformats.org/officeDocument/2006/relationships/image',
+                            '../media/' . $pngFileName
+                        );
+                        $iterator->current()->pngId = 'rId' . $relId;
+                        ++$relId;
+                    }
+
                 } elseif ($iterator->current() instanceof ShapeChart) {
                     // Write relationship for chart drawing
                     $this->writeRelationship(
                         $objWriter,
                         $relId,
                         'http://schemas.openxmlformats.org/officeDocument/2006/relationships/chart',
-                        '../charts/' . $iterator->current()->getIndexedFilename()
+                        '../charts/' . str_replace(' ', '_', $iterator->current()->getIndexedFilename())
                     );
                     $iterator->current()->relationId = 'rId' . $relId;
                     ++$relId;
@@ -95,6 +112,22 @@ abstract class AbstractSlide extends AbstractDecoratorWriter
                             );
                             $iterator2->current()->relationId = 'rId' . $relId;
                             ++$relId;
+
+                            //If it is an SVG
+                            if($iterator2->current()->getExtension() == 'svg') {
+                                $pngFileName = str_replace(' ', '_', $iterator2->current()->getIndexedFilename());
+                                //Replace the .svg with .png
+                                $pngFileName = str_replace(".svg", ".png", $pngFileName);
+                                // Write relationship for image drawing
+                                $this->writeRelationship(
+                                    $objWriter,
+                                    $relId,
+                                    'http://schemas.openxmlformats.org/officeDocument/2006/relationships/image',
+                                    '../media/' . $pngFileName
+                                );
+                                $iterator->current()->pngId = 'rId' . $relId;
+                                ++$relId;
+                            }
                         } elseif ($iterator2->current() instanceof ShapeChart) {
                             // Write relationship for chart drawing
                             $this->writeRelationship(
@@ -199,7 +232,7 @@ abstract class AbstractSlide extends AbstractDecoratorWriter
         // p:sp\p:spPr
         $objWriter->startElement('p:spPr');
 
-        if (!$shape->isPlaceholder()) {
+        //if (!$shape->isPlaceholder()) {
             // p:sp\p:spPr\a:xfrm
             $objWriter->startElement('a:xfrm');
             $objWriter->writeAttributeIf(0 != $shape->getRotation(), 'rot', CommonDrawing::degreesToAngle($shape->getRotation()));
@@ -223,7 +256,7 @@ abstract class AbstractSlide extends AbstractDecoratorWriter
             $objWriter->writeElement('a:avLst');
 
             $objWriter->endElement();
-        }
+        //}
         $this->writeFill($objWriter, $shape->getFill());
         $this->writeBorder($objWriter, $shape->getBorder(), '');
         $this->writeShadow($objWriter, $shape->getShadow());
@@ -235,7 +268,7 @@ abstract class AbstractSlide extends AbstractDecoratorWriter
         // a:bodyPr
         //@link :http://msdn.microsoft.com/en-us/library/documentformat.openxml.drawing.bodyproperties%28v=office.14%29.aspx
         $objWriter->startElement('a:bodyPr');
-        if (!$shape->isPlaceholder()) {
+        //if (!$shape->isPlaceholder()) {
             $verticalAlign = $shape->getActiveParagraph()->getAlignment()->getVertical();
             if (Alignment::VERTICAL_BASE != $verticalAlign && Alignment::VERTICAL_AUTO != $verticalAlign) {
                 $objWriter->writeAttribute('anchor', $verticalAlign);
@@ -274,7 +307,7 @@ abstract class AbstractSlide extends AbstractDecoratorWriter
                 }
             }
             $objWriter->endElement();
-        }
+        //}
         $objWriter->endElement();
         // a:lstStyle
         $objWriter->writeElement('a:lstStyle', null);
@@ -516,7 +549,7 @@ abstract class AbstractSlide extends AbstractDecoratorWriter
             $objWriter->startElement('a:p');
 
             // a:pPr
-            if (!$bIsPlaceholder) {
+            //if (!$bIsPlaceholder) {
                 $objWriter->startElement('a:pPr');
                 $objWriter->writeAttribute('algn', $paragraph->getAlignment()->getHorizontal());
                 $objWriter->writeAttribute('fontAlgn', $paragraph->getAlignment()->getVertical());
@@ -563,7 +596,7 @@ abstract class AbstractSlide extends AbstractDecoratorWriter
                 }
 
                 $objWriter->endElement();
-            }
+            //}
 
             // Loop trough rich text elements
             $elements = $paragraph->getRichTextElements();
@@ -576,7 +609,7 @@ abstract class AbstractSlide extends AbstractDecoratorWriter
                     $objWriter->startElement('a:r');
 
                     // a:rPr
-                    if ($element instanceof Run && !$bIsPlaceholder) {
+                    if ($element instanceof Run ) {
                         // a:rPr
                         $objWriter->startElement('a:rPr');
 
@@ -1188,11 +1221,12 @@ abstract class AbstractSlide extends AbstractDecoratorWriter
         $objWriter->startElement('p:blipFill');
         // a:blip
         $objWriter->startElement('a:blip');
-        $objWriter->writeAttribute('r:embed', $shape->relationId);
 
         //SVG info
 
         if($shape->getExtension() == 'svg') {
+
+            $objWriter->writeAttribute('r:embed', $shape->pngId);
             $objWriter->startElement('a:extLst');
             $objWriter->startElement('a:ext');
             $objWriter->writeAttribute('uri', '{28A0092B-C50C-407E-A947-70E740481C1C}');
@@ -1215,6 +1249,8 @@ abstract class AbstractSlide extends AbstractDecoratorWriter
             $objWriter->endElement();
 
         }
+        else
+            $objWriter->writeAttribute('r:embed', $shape->relationId);
 
         $objWriter->endElement();
         // a:stretch
@@ -1348,7 +1384,19 @@ abstract class AbstractSlide extends AbstractDecoratorWriter
             // a:stretch
             $objWriter->startElement('a:stretch');
             // a:fillRect
-            $objWriter->writeElement('a:fillRect');
+            $objWriter->startElement('a:fillRect');
+
+            $stretch = $oBackground->getStretch();
+
+            if(!empty($stretch)) {
+                $objWriter->writeAttribute('l', "".$stretch['l']);
+                $objWriter->writeAttribute('t', "".$stretch['t']);
+                $objWriter->writeAttribute('r', "".$stretch['r']);
+                $objWriter->writeAttribute('b', "".$stretch['b']);
+            }
+            // > a:fillRect
+            $objWriter->endElement();
+
             // > a:stretch
             $objWriter->endElement();
             // > a:blipFill

@@ -29,6 +29,11 @@ class Image extends AbstractBackground
     protected $width;
 
     /**
+     * @var array
+     */
+    protected $stretch;
+
+    /**
      * Get Path.
      *
      * @return string
@@ -97,5 +102,34 @@ class Image extends AbstractBackground
     public function getIndexedFilename($numSlide)
     {
         return 'background_' . $numSlide . '.' . $this->getExtension();
+    }
+
+    /**
+     * Get the stretch information if it exists
+     *
+     * @param string $numSlide
+     *
+     * @return string
+     */
+    public function setStretch($l, $t, $r, $b)
+    {
+        $this->stretch = array(
+            'l' => $l,
+            't' => $t,
+            'r' => $r,
+            'b' => $b
+        );
+    }
+
+    /**
+     * Get the stretch information if it exists
+     *
+     * @param string $numSlide
+     *
+     * @return string
+     */
+    public function getStretch()
+    {
+        return $this->stretch;
     }
 }

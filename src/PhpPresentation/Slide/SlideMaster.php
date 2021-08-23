@@ -70,6 +70,9 @@ class SlideMaster extends AbstractSlide implements ComparableInterface, ShapeCon
         'folHlink' => '800080',
     ];
 
+    protected $majorFont;
+    protected $minorFont;
+
     /**
      * Create a new slideMaster.
      *
@@ -152,6 +155,49 @@ class SlideMaster extends AbstractSlide implements ComparableInterface, ShapeCon
     public function setTextStyles(TextStyle $textStyle)
     {
         $this->textStyles = $textStyle;
+
+        return $this;
+    }
+
+    /**
+     * @return TextStyle
+     */
+    public function getMajorFont()
+    {
+        if(!empty($this->majorFont))
+            return $this->majorFont;
+        else
+            return 'Calibri';
+    }
+
+    /**
+     * @return $this
+     */
+    public function setMajorFont($font)
+    {
+        $this->majorFont = $font;
+
+        return $this;
+    }
+
+
+    /**
+     * @return String
+     */
+    public function getMinorFont()
+    {
+        if(!empty($this->minorFont))
+            return $this->minorFont;
+        else
+            return 'Calibri';
+    }
+
+    /**
+     * @return $this
+     */
+    public function setMinorFont($font)
+    {
+        $this->minorFont = $font;
 
         return $this;
     }

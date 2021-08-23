@@ -370,9 +370,11 @@ class PowerPoint2007 implements ReaderInterface
                     $oSlide = $this->oPhpPresentation->getActiveSlide();
                     $oSlide->setBackground($oBackground);
                 }
-                $oElementImage = $xmlReader->getElement('a:blipFill/a:blip', $oElement);
+                $oElementImage = $xmlReader->getElement('p:bgPr/a:blipFill', $oElement);
                 if ($oElementImage instanceof DOMElement) {
-                    $relImg = $this->arrayRels['ppt/slides/_rels/' . $baseFile . '.rels'][$oElementImage->getAttribute('r:embed')];
+
+                    $oBlip = $xmlReader->getElement('a:blip', $oElementImage);
+                    $relImg = $this->arrayRels['ppt/slides/_rels/' . $baseFile . '.rels'][$oBlip->getAttribute('r:embed')];
                     if (is_array($relImg)) {
                         // File
                         $pathImage = 'ppt/slides/' . $relImg['Target'];
@@ -391,6 +393,17 @@ class PowerPoint2007 implements ReaderInterface
                         // Background
                         $oBackground = new Slide\Background\Image();
                         $oBackground->setPath($tmpBkgImg);
+
+                        $oStretch = $xmlReader->getElement('a:stretch/a:fillRect', $oElementImage);
+                        if ($oStretch instanceof DOMElement) {
+                            $oBackground->setStretch(
+                                $oStretch->getAttribute('l'),
+                                $oStretch->getAttribute('t'),
+                                $oStretch->getAttribute('r'),
+                                $oStretch->getAttribute('b')
+                            );
+                        }
+
                         // Slide Background
                         $oSlide = $this->oPhpPresentation->getActiveSlide();
                         $oSlide->setBackground($oBackground);
@@ -507,6 +520,15 @@ class PowerPoint2007 implements ReaderInterface
                         }
                     }
 
+                    //Get the font
+                    $oElementSchemeFont = $xmlReader->getElement('a:defRPr/a:latin', $oElementLvl);
+                    if ($oElementSchemeFont instanceof DOMElement) {
+                        if ($oElementSchemeFont->hasAttribute('typeface')) {
+
+                            $oRTParagraph->getFont()->setName($oElementSchemeFont->getAttribute('typeface'));
+                        }
+                    }
+
                     switch ($oElementTxStyle->nodeName) {
                         case 'p:bodyStyle':
                             $oSlideMaster->getTextStyles()->setBodyStyleAtLvl($oRTParagraph, $level);
@@ -620,6 +642,15 @@ class PowerPoint2007 implements ReaderInterface
                     $oSlideMaster->addSchemeColor($oSchemeColor);
                 }
             }
+
+            $oElement = $xmlReader->getElement('/a:theme/a:themeElements/a:fontScheme/a:majorFont/a:latin');
+            if ($oElement instanceof DOMElement && $oElement->hasAttributes()) {
+                $oSlideMaster->setMajorFont($oElement->getAttribute('typeface'));
+            }
+            $oElement = $xmlReader->getElement('/a:theme/a:themeElements/a:fontScheme/a:minorFont/a:latin');
+            if ($oElement instanceof DOMElement && $oElement->hasAttributes()) {
+                $oSlideMaster->setMinorFont($oElement->getAttribute('typeface'));
+            }
         }
     }
 
@@ -655,9 +686,12 @@ class PowerPoint2007 implements ReaderInterface
         }
 
         // Background image
-        $oElementImage = $xmlReader->getElement('p:bgPr/a:blipFill/a:blip', $oElement);
+        $oElementImage = $xmlReader->getElement('p:bgPr/a:blipFill', $oElement);
         if ($oElementImage instanceof DOMElement) {
-            $relImg = $this->arrayRels[$oSlide->getRelsIndex()][$oElementImage->getAttribute('r:embed')];
+
+            $oBlip = $xmlReader->getElement('a:blip', $oElementImage);
+
+            $relImg = $this->arrayRels[$oSlide->getRelsIndex()][$oBlip->getAttribute('r:embed')];
             if (is_array($relImg)) {
                 // File
                 $pathImage = 'ppt/slides/' . $relImg['Target'];
@@ -676,6 +710,17 @@ class PowerPoint2007 implements ReaderInterface
                 // Background
                 $oBackground = new Slide\Background\Image();
                 $oBackground->setPath($tmpBkgImg);
+
+                $oStretch = $xmlReader->getElement('a:stretch/a:fillRect', $oElementImage);
+                if ($oStretch instanceof DOMElement) {
+                    $oBackground->setStretch(
+                        $oStretch->getAttribute('l'),
+                        $oStretch->getAttribute('t'),
+                        $oStretch->getAttribute('r'),
+                        $oStretch->getAttribute('b')
+                    );
+                }
+
                 // Slide Background
                 $oSlide->setBackground($oBackground);
             }

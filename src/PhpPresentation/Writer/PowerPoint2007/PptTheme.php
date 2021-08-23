@@ -113,7 +113,7 @@ class PptTheme extends AbstractDecoratorWriter
 
         // a:theme/a:themeElements/a:fontScheme/a:majorFont/a:latin
         $objWriter->startElement('a:latin');
-        $objWriter->writeAttribute('typeface', 'Calibri');
+        $objWriter->writeAttribute('typeface', $oMasterSlide->getMajorFont());
         $objWriter->endElement();
 
         // a:theme/a:themeElements/a:fontScheme/a:majorFont/a:ea
@@ -140,23 +140,23 @@ class PptTheme extends AbstractDecoratorWriter
         // a:theme/a:themeElements/a:fontScheme/a:minorFont
         $objWriter->startElement('a:minorFont');
 
-        // a:theme/a:themeElements/a:fontScheme/a:majorFont/a:latin
+        // a:theme/a:themeElements/a:fontScheme/a:minorFont/a:latin
         $objWriter->startElement('a:latin');
-        $objWriter->writeAttribute('typeface', 'Calibri');
+        $objWriter->writeAttribute('typeface', $oMasterSlide->getMinorFont());
         $objWriter->endElement();
 
-        // a:theme/a:themeElements/a:fontScheme/a:majorFont/a:ea
+        // a:theme/a:themeElements/a:fontScheme/a:minorFont/a:ea
         $objWriter->startElement('a:ea');
         $objWriter->writeAttribute('typeface', '');
         $objWriter->endElement();
 
-        // a:theme/a:themeElements/a:fontScheme/a:majorFont/a:cs
+        // a:theme/a:themeElements/a:fontScheme/a:minorFont/a:cs
         $objWriter->startElement('a:cs');
         $objWriter->writeAttribute('typeface', '');
         $objWriter->endElement();
 
         foreach ($arrayFont as $script => $typeface) {
-            // a:theme/a:themeElements/a:fontScheme/a:majorFont/a:font
+            // a:theme/a:themeElements/a:fontScheme/a:minorFont/a:font
             $objWriter->startElement('a:font');
             $objWriter->writeAttribute('script', $script);
             $objWriter->writeAttribute('typeface', $typeface);

@@ -215,6 +215,23 @@ class PptSlideMasters extends AbstractSlide
                     $objWriter->endElement();
                     $objWriter->endElement();
                 }
+                if(!empty($oParagraph->getFont()->getName())) {
+                    $objWriter->startElement('a:latin');
+                    $objWriter->writeAttribute('typeface', $oParagraph->getFont()->getName());
+                    $objWriter->writeAttribute('charset', "0");
+                    $objWriter->endElement();
+
+                    $objWriter->startElement('a:ea');
+                    $objWriter->writeAttribute('typeface', $oParagraph->getFont()->getName());
+                    $objWriter->writeAttribute('charset', "0");
+                    $objWriter->endElement();
+
+                    $objWriter->startElement('a:cs');
+                    $objWriter->writeAttribute('typeface', $oParagraph->getFont()->getName());
+                    $objWriter->writeAttribute('charset', "0");
+                    $objWriter->endElement();
+                }
+
                 $objWriter->endElement();
                 $objWriter->endElement();
             }
