@@ -31,6 +31,8 @@ class Base64 extends AbstractDrawingAdapter
      */
     protected $path;
 
+    public $pngId;
+
     /**
      * Base64 constructor.
      */
