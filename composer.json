@@ -29,7 +29,7 @@
         "phpunit/phpunit": ">=7.0",
         "phpdocumentor/phpdocumentor":"^2.0|^3.0",
         "phpmd/phpmd": "2.*",
-        "phpstan/phpstan": "^0.12.88"
+        "phpstan/phpstan": "^0.12.88 || ^1.0.0"
     },
     "suggest": {
         "ext-gd": "Required to add images"
