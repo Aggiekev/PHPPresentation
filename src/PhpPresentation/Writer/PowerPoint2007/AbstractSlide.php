@@ -280,11 +280,12 @@ abstract class AbstractSlide extends AbstractDecoratorWriter
         }
         $objWriter->endElement();
         // a:lstStyle
-        $objWriter->writeElement('a:lstStyle', null);
         if ($shape->isPlaceholder() &&
             (Placeholder::PH_TYPE_SLIDENUM == $shape->getPlaceholder()->getType() ||
                 Placeholder::PH_TYPE_DATETIME == $shape->getPlaceholder()->getType())
         ) {
+
+            $objWriter->writeElement('a:lstStyle', null);
             $objWriter->startElement('a:p');
 
             // Paragraph Style
@@ -315,7 +316,66 @@ abstract class AbstractSlide extends AbstractDecoratorWriter
             ));
             $objWriter->endElement();
             $objWriter->endElement();
+        } elseif ($shape->isPlaceholder() ) {
+
+            //Assume it only has one paragraph
+            $paragraph = $shape->getActiveParagraph();
+            $elements = $paragraph->getRichTextElements();
+            $writtenStyle = false;
+
+            //This will only work if the first paragraph is a text run with styling
+            if (!empty($elements)) {
+                $element = &$elements[0];
+                if ($element instanceof Run) {
+                    //This will allow the placeholder to retain the style when it is filled in on the front end
+                    $objWriter->startElement('a:lstStyle');
+
+                    $objWriter->startElement('a:lvl1pPr');
+                    $objWriter->writeAttribute('algn', $paragraph->getAlignment()->getHorizontal());
+
+                    $objWriter->startElement('a:defRPr');
+                    //Font size
+                    $objWriter->writeAttribute('sz', $element->getFont()->getSize() * 100);
+
+                    // Color - a:solidFill
+                    if($element->getFont()->getColor() instanceof Color) {
+                        $objWriter->startElement('a:solidFill');
+                        $this->writeColor($objWriter, $element->getFont()->getColor());
+                        $objWriter->endElement();
+                    }
+
+                    // Font
+                    // - a:latin
+                    // - a:ea
+                    // - a:cs
+                    $objWriter->startElement('a:latin');
+                    $objWriter->writeAttribute('typeface', $element->getFont()->getName());
+                    $objWriter->endElement();
+
+                    $objWriter->startElement('a:ea');
+                    $objWriter->writeAttribute('typeface', $element->getFont()->getName());
+                    $objWriter->endElement();
+
+                    $objWriter->startElement('a:cs');
+                    $objWriter->writeAttribute('typeface', $element->getFont()->getName());
+                    $objWriter->endElement();
+
+                    $objWriter->endElement();
+                    $objWriter->endElement();
+                    $objWriter->endElement();
+
+                    $writtenStyle = true;
+                }
+            }
+
+            if(!$writtenStyle) {
+                $objWriter->writeElement('a:lstStyle', null);
+            }
+
+
+            $this->writeParagraphs($objWriter, $shape->getParagraphs());
         } else {
+            $objWriter->writeElement('a:lstStyle', null);
             // Write paragraphs
             $this->writeParagraphs($objWriter, $shape->getParagraphs());
         }

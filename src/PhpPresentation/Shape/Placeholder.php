@@ -29,6 +29,7 @@ class Placeholder
     public const PH_TYPE_FOOTER = 'ftr';
     public const PH_TYPE_DATETIME = 'dt';
     public const PH_TYPE_SLIDENUM = 'sldNum';
+    public const PH_TYPE_OBJECT = 'obj';
 
     /**
      * Indicates whether the placeholder should have a customer prompt.
