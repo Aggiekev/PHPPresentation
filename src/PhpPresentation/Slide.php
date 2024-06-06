@@ -105,6 +105,15 @@ class Slide extends AbstractSlide implements ComparableInterface, ShapeContainer
     {
         $this->slideLayout = $layout;
 
+        //TODO: Loop through existing placeholders and copy their values to the new ones. Then delete the old
+
+        //Loop through the layout and copy any shapes that are placeholders on to this slide
+        foreach ($layout->getShapeCollection() as $shape) {
+            if ($shape->isPlaceholder()) {
+                $this->addShape(clone $shape);
+            }
+        }
+
         return $this;
     }
 

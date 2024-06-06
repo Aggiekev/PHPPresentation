@@ -237,11 +237,12 @@ abstract class AbstractSlide extends AbstractDecoratorWriter
         // a:bodyPr
         //@link :http://msdn.microsoft.com/en-us/library/documentformat.openxml.drawing.bodyproperties%28v=office.14%29.aspx
         $objWriter->startElement('a:bodyPr');
+        $verticalAlign = $shape->getActiveParagraph()->getAlignment()->getVertical();
+        if (Alignment::VERTICAL_BASE != $verticalAlign && Alignment::VERTICAL_AUTO != $verticalAlign) {
+            $objWriter->writeAttribute('anchor', $verticalAlign);
+        }
         if (!$shape->isPlaceholder()) {
-            $verticalAlign = $shape->getActiveParagraph()->getAlignment()->getVertical();
-            if (Alignment::VERTICAL_BASE != $verticalAlign && Alignment::VERTICAL_AUTO != $verticalAlign) {
-                $objWriter->writeAttribute('anchor', $verticalAlign);
-            }
+
             if (RichText::WRAP_SQUARE != $shape->getWrap()) {
                 $objWriter->writeAttribute('wrap', $shape->getWrap());
             }
