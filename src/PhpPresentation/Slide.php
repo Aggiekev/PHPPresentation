@@ -110,7 +110,20 @@ class Slide extends AbstractSlide implements ComparableInterface, ShapeContainer
         //Loop through the layout and copy any shapes that are placeholders on to this slide
         foreach ($layout->getShapeCollection() as $shape) {
             if ($shape->isPlaceholder()) {
-                $this->addShape(clone $shape);
+                $s = clone $shape;
+                //If it is a RichText
+                if ($s instanceof \PhpOffice\PhpPresentation\Shape\RichText) {
+                    //Clone the paragraphs
+                    $paras = $s->getParagraphs();
+                    $para_clones = [];
+                    //Loop through and copy the paragraphs
+                    foreach ($paras as $para) {
+                        $newPara = clone $para;
+                        $para_clones[] = $newPara;
+                    }
+                    $s->setParagraphs($para_clones);
+                }
+                $this->addShape($s);
             }
         }
 
