@@ -23,6 +23,10 @@ use PhpOffice\PhpPresentation\ComparableInterface;
 
 class Border implements ComparableInterface
 {
+
+    const END_TYPE_TRIANGLE             = 'triangle';
+    const END_TYPE_NONE                 = 'none';
+
     // Line style
     public const LINE_NONE = 'none';
     public const LINE_SINGLE = 'sng';
@@ -79,9 +83,26 @@ class Border implements ComparableInterface
      */
     private $hashIndex;
 
+    /**
+     * Tail End Type
+     *
+     * @var string
+     */
+    private $tailEnd;
+
+    /**
+     * Head End Type
+     *
+     * @var string
+     */
+    private $headEnd;
+
     public function __construct()
     {
         $this->color = new Color(Color::COLOR_BLACK);
+
+        $this->tailEnd   = Border::END_TYPE_NONE;
+        $this->headEnd   = Border::END_TYPE_NONE;
     }
 
     /**
@@ -206,5 +227,58 @@ class Border implements ComparableInterface
         $this->hashIndex = $value;
 
         return $this;
+    }
+
+    
+    /**
+     * Set tail end type
+     *
+     * Note that this index may vary during script execution! Only reliable moment is
+     * while doing a write of a workbook and when changes are not allowed.
+     *
+     * @param string $value end type
+     */
+    public function setTailEnd($value)
+    {
+        $this->tailEnd = $value;
+    }
+
+    /**
+     * Get tail end type
+     *
+     * Note that this index may vary during script execution! Only reliable moment is
+     * while doing a write of a workbook and when changes are not allowed.
+     *
+     * @param string $value end type
+     */
+    public function getTailEnd()
+    {
+        return $this->tailEnd;
+    }
+
+    /**
+     * Set tail end type
+     *
+     * Note that this index may vary during script execution! Only reliable moment is
+     * while doing a write of a workbook and when changes are not allowed.
+     *
+     * @param string $value end type
+     */
+    public function setHeadEnd($value)
+    {
+        $this->headEnd = $value;
+    }
+
+    /**
+     * Get tail end type
+     *
+     * Note that this index may vary during script execution! Only reliable moment is
+     * while doing a write of a workbook and when changes are not allowed.
+     *
+     * @param string $value end type
+     */
+    public function getHeadEnd()
+    {
+        return $this->headEnd;
     }
 }
