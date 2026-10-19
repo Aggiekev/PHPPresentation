@@ -25,6 +25,7 @@ use PhpOffice\Common\XMLWriter;
 use PhpOffice\PhpPresentation\Shape\Chart as ShapeChart;
 use PhpOffice\PhpPresentation\Shape\Comment;
 use PhpOffice\PhpPresentation\Shape\Drawing as ShapeDrawing;
+use PhpOffice\PhpPresentation\Shape\Drawing\DualFormatBase64;
 use PhpOffice\PhpPresentation\Shape\Group;
 use PhpOffice\PhpPresentation\Shape\Media;
 use PhpOffice\PhpPresentation\Shape\RichText;
@@ -114,10 +115,18 @@ class PptSlides extends AbstractSlide
                         $this->writeRelationship($objWriter, $relId, 'http://schemas.microsoft.com/office/2007/relationships/media', '../media/' . $currentShape->getIndexedFilename());
                         ++$relId;
                     } elseif ($currentShape instanceof ShapeDrawing\AbstractDrawingAdapter) {
-                        // Write relationship for image drawing
-                        $this->writeRelationship($objWriter, $relId, 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/image', '../media/' . $currentShape->getIndexedFilename());
-                        $currentShape->relationId = 'rId' . $relId;
-                        ++$relId;
+                        if ($currentShape instanceof DualFormatBase64 && $currentShape->hasPngFallback()) {
+                            $this->writeRelationship($objWriter, $relId, 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/image', '../media/' . $currentShape->getPngIndexedFilename());
+                            $currentShape->relationId = 'rId' . $relId;
+                            ++$relId;
+                            $this->writeRelationship($objWriter, $relId, 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/image', '../media/' . $currentShape->getIndexedFilename());
+                            $currentShape->svgRelationId = 'rId' . $relId;
+                            ++$relId;
+                        } else {
+                            $this->writeRelationship($objWriter, $relId, 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/image', '../media/' . $currentShape->getIndexedFilename());
+                            $currentShape->relationId = 'rId' . $relId;
+                            ++$relId;
+                        }
                     } elseif ($currentShape instanceof ShapeChart) {
                         // Write relationship for chart drawing
                         $this->writeRelationship($objWriter, $relId, 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/chart', '../charts/' . $currentShape->getIndexedFilename());

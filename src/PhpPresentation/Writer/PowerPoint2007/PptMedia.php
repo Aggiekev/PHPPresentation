@@ -21,6 +21,7 @@ namespace PhpOffice\PhpPresentation\Writer\PowerPoint2007;
 
 use PhpOffice\Common\Adapter\Zip\ZipInterface;
 use PhpOffice\PhpPresentation\Shape\Drawing\AbstractDrawingAdapter;
+use PhpOffice\PhpPresentation\Shape\Drawing\DualFormatBase64;
 
 class PptMedia extends AbstractDecoratorWriter
 {
@@ -32,6 +33,10 @@ class PptMedia extends AbstractDecoratorWriter
                 continue;
             }
             $this->getZip()->addFromString('ppt/media/' . $shape->getIndexedFilename(), $shape->getContents());
+
+            if ($shape instanceof DualFormatBase64 && $shape->hasPngFallback()) {
+                $this->getZip()->addFromString('ppt/media/' . $shape->getPngIndexedFilename(), $shape->getPngContents());
+            }
         }
 
         return $this->getZip();
