@@ -30,6 +30,7 @@ use PhpOffice\PhpPresentation\Shape\AutoShape;
 use PhpOffice\PhpPresentation\Shape\Chart as ShapeChart;
 use PhpOffice\PhpPresentation\Shape\Comment;
 use PhpOffice\PhpPresentation\Shape\Drawing\AbstractDrawingAdapter;
+use PhpOffice\PhpPresentation\Shape\Drawing\DualFormatBase64;
 use PhpOffice\PhpPresentation\Shape\Drawing\File as ShapeDrawingFile;
 use PhpOffice\PhpPresentation\Shape\Drawing\Gd as ShapeDrawingGd;
 use PhpOffice\PhpPresentation\Shape\Group;
@@ -1449,7 +1450,11 @@ abstract class AbstractSlide extends AbstractDecoratorWriter
             // a:extLst > a:ext > asvg:svgBlip
             $objWriter->startElement('asvg:svgBlip');
             $objWriter->writeAttribute('xmlns:asvg', 'http://schemas.microsoft.com/office/drawing/2016/SVG/main');
-            $objWriter->writeAttribute('r:embed', $shape->relationId);
+            if ($shape instanceof DualFormatBase64 && $shape->hasPngFallback()) {
+                $objWriter->writeAttribute('r:embed', $shape->svgRelationId);
+            } else {
+                $objWriter->writeAttribute('r:embed', $shape->relationId);
+            }
             // a:extLst > a:ext > ##asvg:svgBlip
             $objWriter->endElement();
             // a:extLst > ##a:ext
